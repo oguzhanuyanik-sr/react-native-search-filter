@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import filter from 'lodash.filter';
 
 const API_ENDPOINT = `https://randomuser.me/api/?results=30`;
 
@@ -33,6 +34,7 @@ export default function App() {
 
       console.log(json.results);
 
+      setFullData(json.results);
       setIsLoading(false);
     } catch (error) {
       setError(error);
@@ -42,6 +44,26 @@ export default function App() {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+    const formattedQuery = query.toLowerCase();
+    const filteredData = filter(fullData, (user) => {
+      return contains(user, formattedQuery);
+    });
+
+    setData(filteredData);
+  };
+
+  const contains = ({ name, email }, query) => {
+    const { first, last } = name;
+
+    if (
+      first.includes(query) ||
+      last.includes(query) ||
+      email.includes(query)
+    ) {
+      return true;
+    }
+
+    return false;
   };
 
   if (isLoading) {
